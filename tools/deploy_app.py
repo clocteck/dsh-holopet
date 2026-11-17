@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""把 build/dsh_fish 增量部署到 HoloCubic 设备（用 --host 或改 HOST）。
+"""把 app/ 部署到 --host 指定的 HoloCubic；不会删除旧版资源。
 
 设备接口（实测）：
   * 建目录：POST http://HOST/devtools/api/mkdir?path=<urlencoded>
@@ -8,13 +8,14 @@
   * 重启应用：POST /api/system/exit  +  POST /api/system/launch?id=dsh_fish
 
 用法：
-    python tools/deploy_app.py            # 全量
-    python tools/deploy_app.py main.lua   # 只传指定相对路径（可多个）
+    python tools/deploy_app.py --host 192.168.1.131
+    python tools/deploy_app.py --host 192.168.1.131 main.lua
 """
 
 from __future__ import annotations
 
 import sys
+import argparse
 import time
 import urllib.parse
 import urllib.request
@@ -23,7 +24,7 @@ from pathlib import Path
 HOST = "192.168.1.100"
 APP_ID = "dsh_fish"
 REMOTE_ROOT = "/sd/apps/" + APP_ID
-LOCAL_ROOT = Path(__file__).resolve().parent.parent / "build" / APP_ID
+LOCAL_ROOT = Path(__file__).resolve().parent.parent / "app"
 TIMEOUT = 20
 
 
@@ -56,10 +57,16 @@ def upload(local: Path, remote: str) -> None:
 
 
 def main() -> int:
+    global HOST
+    parser = argparse.ArgumentParser(description="Upload app/; does not delete old resources.")
+    parser.add_argument("--host", required=True)
+    parser.add_argument("files", nargs="*")
+    args = parser.parse_args()
+    HOST = args.host
     if not LOCAL_ROOT.is_dir():
         raise SystemExit("找不到本地目录: %s" % LOCAL_ROOT)
 
-    only = sys.argv[1:]
+    only = args.files
     files = sorted(p for p in LOCAL_ROOT.rglob("*") if p.is_file())
     if only:
         def hit(rel: str) -> bool:
@@ -73,7 +80,7 @@ def main() -> int:
         if not files:
             raise SystemExit("没有匹配的文件")
 
-    dirs = sorted({str(p.relative_to(LOCAL_ROOT).parent).replace("\\", "/") for p in files})
+    dirs = ["."] + sorted(str(p.relative_to(LOCAL_ROOT)).replace("\\", "/") for p in LOCAL_ROOT.rglob("*") if p.is_dir())
     for rel in dirs:
         remote = REMOTE_ROOT if rel == "." else REMOTE_ROOT + "/" + rel
         mkdir(remote)

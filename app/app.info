@@ -17,4 +17,4 @@ description_zh_tw = 在 HoloCubic 上即時顯示 DeepSeek Harness 的工作狀�
 description_zh_hant = 在 HoloCubic 上即時顯示 DeepSeek Harness 的工作狀態、執行中的指令與上下文佔用
 description_en = Live DeepSeek Harness agent status, running command and context usage on HoloCubic
 description_ja = HoloCubic に DeepSeek Harness の作業状態と実行中のコマンドを表示します
-version = 1.0.0
+version = 1.5.1

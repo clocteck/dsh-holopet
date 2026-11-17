@@ -19,7 +19,7 @@ return {
   id = "pc2005",
   name = "蓝毛小女仆",
   name_en = "Blue Maid",
-  speeds = { slow = 150, normal = 120, fast = 90 },
+  speeds = { normal = 120 },
   default_speed = "normal",
   events = {
     ["Idle"] = { "daiji-huxi-xiuxian.gif", "dongzhangxiwang.gif", "youxian-hengga.gif", "zhao-jingzi.gif", "haqian-liantian.gif", "yaoshan-naliang.gif", "da-keshui-bei-jingxing.gif", "nvpu-quxi-liyi.gif" },

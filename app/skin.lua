@@ -69,7 +69,7 @@ Skin.DEFAULT_THEME = {
 }
 
 Skin.DEFAULT_STATE = {
-  active = "whale",
+  active = "pc2005",
   speed = "normal",
   theme = {},
   behavior = {
@@ -80,8 +80,8 @@ Skin.DEFAULT_STATE = {
     variants = {
       Idle = {
         mode = "seq",
-        enabled = { "idle_01.gif", "idle_02.gif", "idle_03.gif", "idle_04.gif" },
-        walk = { "idle_01.gif" },
+        enabled = { "daiji-huxi-xiuxian.gif", "dongzhangxiwang.gif", "youxian-hengga.gif" },
+        walk = {},
       },
     },
   },
@@ -107,9 +107,12 @@ end
 
 function Skin.load_state(APP_DIR)
   local saved = decode_json(read_text(Skin.state_path(APP_DIR))) or {}
+  if saved.active ~= "pc2005" then
+    saved.behavior = nil -- Old skin filenames must not survive migration.
+  end
   local state = {
-    active = type(saved.active) == "string" and saved.active or Skin.DEFAULT_STATE.active,
-    speed = type(saved.speed) == "string" and saved.speed or Skin.DEFAULT_STATE.speed,
+    active = "pc2005",
+    speed = "normal",
     theme = {},
     skins = type(saved.skins) == "table" and saved.skins or nil,
     hidden = type(saved.hidden) == "table" and saved.hidden or {},
@@ -199,7 +202,7 @@ local function pack_turn(list, dir, speed)
 end
 
 function Skin.resolve(manifest, dir, speed)
-  local chosen = speed
+  local chosen = "normal"
   if type(manifest.speeds) == "table" and not manifest.speeds[chosen] then
     chosen = manifest.default_speed or "normal"
   end
@@ -218,23 +221,8 @@ function Skin.resolve(manifest, dir, speed)
   local out = { events = {}, weather = {}, speed = chosen, id = manifest.id, name = manifest.name,
         labels = manifest.labels or {},
         categories = manifest.categories or {},
-    moves = pack_moves(manifest.moves, dir, speed),
-    turn = pack_turn(manifest.turn, dir, speed) }
-  -- 移动动画池：每项记下朝向（left/right），设备端据此决定要不要用镜像版
-  if type(manifest.moves) == "table" then
-    for _, m in ipairs(manifest.moves) do
-      if type(m) == "table" and type(m.file) == "string" then
-        out.moves[#out.moves + 1] = { path = base .. m.file, base = m.file,
-          lead = tonumber(m.lead) or 2.0, tail = tonumber(m.tail) or 2.0,
-          facing = m.facing or "right" }
-      end
-    end
-  end
-  if type(manifest.turn) == "table" then
-    for _, f in ipairs(manifest.turn) do
-      if type(f) == "string" then out.turn[#out.turn + 1] = base .. f end
-    end
-  end
+    moves = pack_moves(manifest.moves, dir, chosen),
+    turn = pack_turn(manifest.turn, dir, chosen) }
   for event, files in pairs(manifest.events or {}) do
     local list = {}
     if type(files) == "table" then
@@ -248,12 +236,12 @@ function Skin.resolve(manifest, dir, speed)
 end
 
 -- 可用皮肤清单：优先读 state.skins；缺失时用内置兜底表
-Skin.BUILTIN_SKINS = { "whale", "chibi-blue" }
+Skin.BUILTIN_SKINS = { "pc2005" }
 
 function Skin.list(APP_DIR, state)
   local ids, seen = {}, {}
   local function push(id)
-    if type(id) == "string" and #id > 0 and not seen[id] then
+    if id == "pc2005" and not seen[id] then
       seen[id] = true
       ids[#ids + 1] = id
     end

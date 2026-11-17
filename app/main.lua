@@ -35,13 +35,8 @@ local Sound = dofile(APP_DIR .. "/sound.lua")
 local SKIN_STATE = Skin.load_state(APP_DIR)
 pcall(Sound.set_volume, (SKIN_STATE and SKIN_STATE.sound_volume) or 0.8)
 local SKIN_MANIFEST, SKIN_DIR = Skin.load_pack(APP_DIR, SKIN_STATE.active)
-local ClawdPack
-if SKIN_MANIFEST then
-  ClawdPack = Skin.resolve(SKIN_MANIFEST, SKIN_DIR, SKIN_STATE.speed)
-else
-  -- 回退：老的单皮肤布局
-  ClawdPack = dofile(APP_DIR .. "/assets/whale/manifest.lua")
-end
+assert(SKIN_MANIFEST, "Missing Blue Maid manifest: " .. SKIN_DIR)
+local ClawdPack = Skin.resolve(SKIN_MANIFEST, SKIN_DIR, "normal")
 local ConsoleText = nil
 local console_loader_error = ""
 do
@@ -55,7 +50,7 @@ end
 
 local function rebase_asset_paths(value)
   if type(value) == "string" then
-    return (value:gsub("^/sd/apps/dsh_fish/", APP_DIR .. "/"))
+    return (value:gsub("^/sd/apps/dsh_fish/", function() return APP_DIR .. "/" end))
   end
   if type(value) == "table" then
     for key, item in pairs(value) do
@@ -85,7 +80,7 @@ if previous and previous.stop then
 end
 
 local APP = {
-  VERSION = "1.5.0",
+  VERSION = "1.5.1",
   running = true,
   timer = nil,
   controller_timer = nil,
@@ -362,9 +357,8 @@ local EVENT_ALIASES = {
   ["response_item:web_search_call"] = "PreToolUse",
 }
 
-local MEME_DIR = APP_DIR .. "/assets/whale/meme/"
 -- B 页左下角的「陪看」角色直接用当前皮肤包里的 Idle 动画——皮肤包里一定有素材，
--- 老的 assets/whale/meme/*.gif 梗图不再作为必需项。
+-- 使用当前皮肤的本地缩略图。
 local SESSION_MEMES = {}
 do
   local idle = (ClawdPack and ClawdPack.events and ClawdPack.events.Idle) or {}
@@ -1627,7 +1621,7 @@ local function visual_candidates(group, moving)
   local enabled = type(conf.enabled) == "table" and conf.enabled or nil
   local walkable = type(conf.walk) == "table" and conf.walk or nil
   local speed = (type(SKIN_STATE) == "table" and SKIN_STATE.speed) or "normal"
-  local base_dir = (SKIN_DIR or (APP_DIR .. "/assets/skins/whale")) .. "/" .. speed
+  local base_dir = SKIN_DIR .. "/" .. speed
   local out = {}
   local function push(path, base)
     if moving and (walkable == nil or not name_in(walkable, base)) then return end
@@ -1711,7 +1705,7 @@ local function set_visual(state)
     local need = (facing == "left" and APP.walk.dir == 1) or (facing ~= "left" and APP.walk.dir == -1)
     if need then
       local speed = (type(SKIN_STATE) == "table" and SKIN_STATE.speed) or "normal"
-      local mirrored = (SKIN_DIR or (APP_DIR .. "/assets/skins/whale")) .. "/mirror/" .. speed .. "/" .. tostring(base)
+      local mirrored = SKIN_DIR .. "/mirror/" .. speed .. "/" .. tostring(base)
       if file.exists(mirrored) then source = mirrored end
     end
   end
@@ -2473,7 +2467,7 @@ local function bind_keys()
     APP.controller_timer:alarm(40, tmr.ALARM_AUTO, function()
       if not APP.running then return end
       local ok, pad = pcall(function() return controller.state("ble-main") end)
-      local buttons = ok and type(pad) == "table" and tonumber(pad.buttons) or 0
+      local buttons = ok and type(pad) == "table" and pad.connected ~= false and tonumber(pad.buttons) or 0
       buttons = buttons or 0
       local pressed = buttons & (~APP.controller_buttons)
       APP.controller_buttons = buttons
@@ -2561,7 +2555,7 @@ bind_keys()
 local function apply_skin(patch)
   patch = patch or {}
   if type(patch.active) == "string" and #patch.active > 0 then
-    if Skin.load_pack(APP_DIR, patch.active) then
+    if patch.active == "pc2005" and Skin.load_pack(APP_DIR, patch.active) then
       if SKIN_STATE.active ~= patch.active then
         -- 换皮肤 = 换整套动作库，旧皮肤的文件名配置对新皮肤无意义，清空让页面按新皮肤重填
         SKIN_STATE.behavior = SKIN_STATE.behavior or {}
@@ -2570,7 +2564,7 @@ local function apply_skin(patch)
       end
     end
   end
-  if type(patch.speed) == "string" and patch.speed ~= "" then SKIN_STATE.speed = patch.speed end
+  SKIN_STATE.speed = "normal"
   if type(patch.skins) == "table" then SKIN_STATE.skins = patch.skins end
   if type(patch.move_speed) == "table" then
     SKIN_STATE.move_speed = SKIN_STATE.move_speed or {}
@@ -2768,7 +2762,7 @@ APP.web = HoloWeb.new({
       walk = SKIN_STATE.walk or {},
       categories = (function()
   local out = {}
-  local skin_id = (type(SKIN_STATE) == "table" and SKIN_STATE.active) or "whale"
+  local skin_id = (type(SKIN_STATE) == "table" and SKIN_STATE.active) or "pc2005"
   local spd = (type(SKIN_STATE) == "table" and SKIN_STATE.speed) or "normal"
   for _, c in ipairs((ClawdPack and ClawdPack.categories) or {}) do
     local item = { id = c.id or "?", files = {} }

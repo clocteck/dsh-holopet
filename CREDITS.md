@@ -1,6 +1,6 @@
 # 致谢与素材来源 / Credits & Asset Sources
 
-本项目的代码与素材来自三个开源项目，各自遵循不同的许可协议。**代码**采用 GPL-3.0，**素材**分别遵循其原始许可。
+本项目的代码与素材继承上游项目，各自遵循原始许可。此精简分支仅分发蓝毛女仆标准速度素材及缩略图、镜像；鲸鱼娘署名保留为历史记录，但不再分发其资源。**代码**采用 GPL-3.0，**素材**分别遵循其原始许可。
 
 This project builds on three open-source projects. **Code** is licensed under GPL-3.0; **assets** keep their original licenses.
 
