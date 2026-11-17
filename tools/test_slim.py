@@ -73,6 +73,11 @@ assert not re.search(r'<(?:script|img)[^>]+(?:src)="https?://', html)
 assert "html{background:#000000}" in html and "background:#0b1512" not in html
 assert "pnpm add dsh-pet-holocubic" in html and "dsh.profile.bundles" in html
 assert "1.5.1" in html and "version = 1.5.1" in (APP / "app.info").read_text(encoding="utf-8")
+metadata = dict(line.split("=", 1) for line in (APP / "app.info").read_text(encoding="utf-8").splitlines() if "=" in line)
+metadata = {k.strip(): v.strip() for k, v in metadata.items()}
+assert metadata["author"] == "chicochol"
+assert metadata["name_zh_cn"] == "大肥鱼" and metadata["name_en"] == "DSH-PET"
+assert metadata["icon"] == "main.png" and (APP / metadata["icon"]).is_file()
 js = re.search(r"<script>(.*?)</script>", html, re.S).group(1)
 node_test = """
 const vm=require('node:vm'), assert=require('node:assert/strict');

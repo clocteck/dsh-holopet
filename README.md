@@ -26,6 +26,8 @@ DSH Desktop 插件（Node.js）监听任务事件，通过局域网 HTTP/SSE 推
 
 ## 验证与打包
 
+发布前逐项完成 [App 发布检查清单](docs/README_APP_RELEASE.md)，包括手柄、作者、图标、资源路径、介绍页、多语言及线上接口验收。
+
 - python tools/test_slim.py （需要 lupa）
 - powershell -File tools/build_slim.ps1 （输出 dist/dsh_fish-1.5.1.zip）
 

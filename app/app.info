@@ -5,6 +5,7 @@ name_zh_tw = 大肥魚
 name_zh_hant = 大肥魚
 name_en = DSH-PET
 name_ja = DSH-PET
+author = chicochol
 kind = app
 category = tool
 catalog_scope = community
