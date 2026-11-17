@@ -1,4 +1,4 @@
-# HoloPet — Blue Maid Lite / 蓝毛女仆精简版
+# 大肥鱼 / DSH-PET — 蓝毛女仆精简版
 
 Fork of [chicochol/dsh-holopet](https://github.com/chicochol/dsh-holopet), based on upstream 583123d.
 
