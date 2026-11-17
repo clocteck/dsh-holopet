@@ -70,6 +70,8 @@ html = (APP / "info.html").read_text(encoding="utf-8")
 encoded = re.search(r'src="data:image/png;base64,([^"]+)"', html).group(1)
 assert base64.b64decode(encoded) == (APP / "main.png").read_bytes()
 assert not re.search(r'<(?:script|img)[^>]+(?:src)="https?://', html)
+assert "html{background:#000000}" in html and "background:#0b1512" not in html
+assert "pnpm add dsh-pet-holocubic" in html and "dsh.profile.bundles" in html
 assert "1.5.1" in html and "version = 1.5.1" in (APP / "app.info").read_text(encoding="utf-8")
 js = re.search(r"<script>(.*?)</script>", html, re.S).group(1)
 node_test = """
@@ -80,10 +82,14 @@ const script=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
 vm.runInNewContext(script,{document});
 assert.equal(document.documentElement.lang,'zh-CN');
 assert.equal(elements.lang.textContent,'EN');
+assert.equal(elements.pluginTitle.textContent,'电脑端插件安装');
+assert.ok(elements.pluginVerify.textContent.includes('http://127.0.0.1:17890/state'));
 elements.lang.onclick();
 assert.equal(document.documentElement.lang,'en');
 assert.equal(elements.lang.textContent,'中文');
 assert.equal(elements.icon.alt,'HoloPet app icon');
+assert.equal(elements.pluginTitle.textContent,'Install the desktop plugin');
+assert.ok(elements.pluginBundle.textContent.includes('dsh.profile.bundles'));
 elements.lang.onclick(); assert.equal(document.documentElement.lang,'zh-CN');
 """
 import json
