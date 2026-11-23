@@ -2,6 +2,8 @@
 
 Fork of [chicochol/dsh-holopet](https://github.com/chicochol/dsh-holopet), based on upstream 583123d.
 
+设备资料：[HoloCubic 平台介绍](https://clocteck.com/pages/holocubic) · [ClocTeck 官网](https://clocteck.com/)
+
 ## 精简内容
 
 - 仅保留蓝毛女仆 114 个标准速度动作、114 个 B 页小动画、3 个标准速度镜像，以及字体、音效和运行模块。

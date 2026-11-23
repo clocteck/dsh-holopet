@@ -1,3 +1,4 @@
+-- [HoloCubic platform](https://clocteck.com/pages/holocubic) | [ClocTeck website](https://clocteck.com/)
 local APP_DIR = "/sd/apps/dsh_fish"
 local APP_ID = nil
 if app and app.current then
